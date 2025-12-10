@@ -1,0 +1,55 @@
+[
+  {
+    "query": "Hello, can you help me analyze a company?",
+    "expected_tool_use": [],
+    "reference": "Hello! I can help you with financial analysis, market research, and KPI calculations. What would you like to analyze?"
+  },
+  {
+    "query": "Analyze the income statement for TechCorp for Q1 2024",
+    "expected_tool_use": [
+      {
+        "tool_name": "analyze_financial_statement",
+        "tool_input": {
+          "statement_type": "income",
+          "company": "TechCorp",
+          "period": "Q1 2024"
+        }
+      }
+    ],
+    "reference": "Based on the income statement analysis for TechCorp Q1 2024, revenue was $1M with net income of $250K (25% margin). Key insights include 15% YoY revenue growth and maintained profitability."
+  },
+  {
+    "query": "What is the current market size for the fintech industry?",
+    "expected_tool_use": [
+      {
+        "tool_name": "research_market",
+        "tool_input": {
+          "industry": "fintech",
+          "region": "global"
+        }
+      }
+    ],
+    "reference": "The fintech market is valued at approximately $500B with an 8.5% growth rate. Key trends include digital transformation and sustainability focus."
+  },
+  {
+    "query": "Calculate the ROE for a company with $1M net income and $10M equity",
+    "expected_tool_use": [
+      {
+        "tool_name": "calculate_kpi",
+        "tool_input": {
+          "kpi_name": "roe",
+          "input_data": {
+            "net_income": 1000000,
+            "equity": 10000000
+          }
+        }
+      }
+    ],
+    "reference": "The Return on Equity (ROE) is 10%, calculated as Net Income / Shareholders' Equity. This indicates moderate profitability relative to equity."
+  },
+  {
+    "query": "Thank you for your help!",
+    "expected_tool_use": [],
+    "reference": "You're welcome! Feel free to ask if you need any more financial analysis or research."
+  }
+]
