@@ -23,10 +23,16 @@ export const Header: React.FC = () => {
           {/* Navigation */}
           <nav className="hidden md:flex items-center gap-6">
             <Link
+              to="/"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              Home
+            </Link>
+            <Link
               to="/catalog"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
-              Agent Catalog
+              Agents
             </Link>
             <Link
               to="/chat"

@@ -1,13 +1,13 @@
 import os
 import uvicorn
 from google.adk.cli.fast_api import get_fast_api_app
-from myagent.tools.database import PostgreSQLConnector
+from financial_agent.tools.database import InMemoryConnector
 from dotenv import load_dotenv
 
 load_dotenv()
 
 # Database configuration
-db_helper = PostgreSQLConnector()
+db_helper = InMemoryConnector()
 SESSION_SERVICE_URI = db_helper.get_conn_string()
 
 # CORS configuration

@@ -21,6 +21,8 @@ dependencies = [
     "google-cloud-storage>=2.18.2",
     "pg8000>=1.31.0",
     "cloud-sql-python-connector[pg8000]>=1.11.0",
+    "fastapi>=0.118.3",
+    "uvicorn[standard]>=0.38.0",
 ]
 
 [dependency-groups]

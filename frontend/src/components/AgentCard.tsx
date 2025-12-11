@@ -1,47 +1,117 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Bot, ArrowRight } from 'lucide-react';
-import { Agent } from '../api/agents';
+import { useNavigate } from 'react-router-dom';
+import { ArrowRight, Sparkles } from 'lucide-react';
+
+export interface Agent {
+  id: string;
+  name: string;
+  description: string;
+  tags: string[];
+  icon?: string;
+  color?: string;
+}
 
 interface AgentCardProps {
   agent: Agent;
 }
 
 export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
+  const navigate = useNavigate();
+
+  const handleClick = () => {
+    navigate('/chat', { 
+      state: { 
+        agentId: agent.id,
+        agentName: agent.name 
+      } 
+    });
+  };
+
+  // Agent-specific colors
+  const getColorClasses = () => {
+    switch (agent.id) {
+      case 'financial_agent':
+        return {
+          bg: 'bg-blue-50',
+          icon: 'bg-blue-500',
+          iconHover: 'group-hover:bg-blue-600',
+          text: 'text-blue-600',
+        };
+      case 'market_agent':
+        return {
+          bg: 'bg-green-50',
+          icon: 'bg-green-500',
+          iconHover: 'group-hover:bg-green-600',
+          text: 'text-green-600',
+        };
+      case 'kpi_agent':
+        return {
+          bg: 'bg-purple-50',
+          icon: 'bg-purple-500',
+          iconHover: 'group-hover:bg-purple-600',
+          text: 'text-purple-600',
+        };
+      case 'ai_opportunity_agent':
+        return {
+          bg: 'bg-orange-50',
+          icon: 'bg-orange-500',
+          iconHover: 'group-hover:bg-orange-600',
+          text: 'text-orange-600',
+        };
+      default:
+        return {
+          bg: 'bg-primary-50',
+          icon: 'bg-primary-500',
+          iconHover: 'group-hover:bg-primary-600',
+          text: 'text-primary-600',
+        };
+    }
+  };
+
+  const colors = getColorClasses();
+
   return (
-    <Link
-      to={`/chat/${agent.id}`}
-      className="card hover:shadow-md transition-shadow group"
+    <div
+      onClick={handleClick}
+      className="group bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-primary-500 hover:shadow-lg transition-all duration-200 cursor-pointer"
     >
-      <div className="flex items-start gap-4">
-        <div className="flex-shrink-0 w-12 h-12 bg-primary-100 rounded-lg flex items-center justify-center">
-          <Bot className="w-6 h-6 text-primary-600" />
-        </div>
-        
-        <div className="flex-1 min-w-0">
-          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
-            {agent.name}
-          </h3>
-          <p className="mt-1 text-sm text-gray-600 line-clamp-2">
-            {agent.description}
-          </p>
-          
-          {agent.tags && agent.tags.length > 0 && (
-            <div className="mt-3 flex flex-wrap gap-2">
-              {agent.tags.slice(0, 3).map((tag) => (
-                <span
-                  key={tag}
-                  className="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-md"
-                >
-                  {tag}
-                </span>
-              ))}
-            </div>
-          )}
-        </div>
-        
-        <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-primary-600 group-hover:translate-x-1 transition-all" />
+      {/* Icon */}
+      <div className={`inline-flex items-center justify-center w-14 h-14 ${colors.icon} ${colors.iconHover} rounded-xl mb-4 transition-colors`}>
+        <Sparkles className="w-7 h-7 text-white" />
       </div>
-    </Link>
+
+      {/* Name */}
+      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+        {agent.name}
+      </h3>
+
+      {/* Description */}
+      <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
+        {agent.description}
+      </p>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-4">
+        {agent.tags.slice(0, 3).map((tag) => (
+          <span
+            key={tag}
+            className={`px-3 py-1 ${colors.bg} ${colors.text} text-xs font-medium rounded-full`}
+          >
+            {tag}
+          </span>
+        ))}
+        {agent.tags.length > 3 && (
+          <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
+            +{agent.tags.length - 3} more
+          </span>
+        )}
+      </div>
+
+      {/* Action */}
+      <div className="flex items-center text-primary-600 font-medium text-sm group-hover:text-primary-700">
+        <span>Start conversation</span>
+        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+      </div>
+    </div>
   );
 };
