@@ -73,44 +73,33 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
   return (
     <div
       onClick={handleClick}
-      className="group bg-white rounded-xl border-2 border-gray-200 p-6 hover:border-primary-500 hover:shadow-lg transition-all duration-200 cursor-pointer"
+      className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-primary-500 hover:shadow-md transition-all duration-200 cursor-pointer"
     >
-      {/* Icon */}
-      <div className={`inline-flex items-center justify-center w-14 h-14 ${colors.icon} ${colors.iconHover} rounded-xl mb-4 transition-colors`}>
-        <Sparkles className="w-7 h-7 text-white" />
-      </div>
-
-      {/* Name */}
-      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+      {/* Name - prominently displayed in teal */}
+      <h3 className="text-xl font-semibold text-primary-500 mb-3 group-hover:text-primary-600 transition-colors">
         {agent.name}
       </h3>
 
       {/* Description */}
-      <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-3">
+      <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-2">
         {agent.description}
       </p>
 
       {/* Tags */}
-      <div className="flex flex-wrap gap-2 mb-4">
-        {agent.tags.slice(0, 3).map((tag) => (
+      <div className="flex flex-wrap gap-2">
+        {agent.tags.slice(0, 4).map((tag) => (
           <span
             key={tag}
-            className={`px-3 py-1 ${colors.bg} ${colors.text} text-xs font-medium rounded-full`}
+            className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full"
           >
             {tag}
           </span>
         ))}
-        {agent.tags.length > 3 && (
+        {agent.tags.length > 4 && (
           <span className="px-3 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded-full">
-            +{agent.tags.length - 3} more
+            +{agent.tags.length - 4}
           </span>
         )}
-      </div>
-
-      {/* Action */}
-      <div className="flex items-center text-primary-600 font-medium text-sm group-hover:text-primary-700">
-        <span>Start conversation</span>
-        <ArrowRight className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
       </div>
     </div>
   );

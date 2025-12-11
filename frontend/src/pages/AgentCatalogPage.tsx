@@ -106,21 +106,14 @@ export const AgentCatalogPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-3">
-            <div className="w-12 h-12 bg-primary-500 rounded-xl flex items-center justify-center">
-              <Sparkles className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">Agent Catalog</h1>
-              <p className="text-gray-600">
-                Choose an AI agent to help with your task
-              </p>
-            </div>
-          </div>
+          <h1 className="text-4xl font-bold text-primary-500 mb-3">Agent Catalog</h1>
+          <p className="text-lg text-gray-600">
+            Powerful AI agents designed to support you with financial analysis, market research, AI opportunity identification, and KPI development for your clients.
+          </p>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="mb-6">
           {/* Search Bar */}
           <div className="flex items-center gap-4 mb-6">
             <div className="flex-1 relative">
@@ -129,8 +122,8 @@ export const AgentCatalogPage: React.FC = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search agents by name or capability..."
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                placeholder="Search agents by name, description, or tag..."
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
               />
             </div>
 
@@ -140,7 +133,7 @@ export const AgentCatalogPage: React.FC = () => {
                 onClick={() => setViewMode('grid')}
                 className={`p-2 rounded-md transition-colors ${
                   viewMode === 'grid'
-                    ? 'bg-white text-primary-600 shadow-sm'
+                    ? 'bg-gray-900 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
                 title="Grid view"
@@ -151,7 +144,7 @@ export const AgentCatalogPage: React.FC = () => {
                 onClick={() => setViewMode('list')}
                 className={`p-2 rounded-md transition-colors ${
                   viewMode === 'list'
-                    ? 'bg-white text-primary-600 shadow-sm'
+                    ? 'bg-gray-900 text-white shadow-sm'
                     : 'text-gray-600 hover:text-gray-900'
                 }`}
                 title="List view"
@@ -162,31 +155,30 @@ export const AgentCatalogPage: React.FC = () => {
           </div>
 
           {/* Filter Tags */}
-          <div>
-            <h3 className="text-sm font-medium text-gray-700 mb-3">Filter by category:</h3>
-            <div className="flex flex-wrap gap-2">
-              {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => toggleTag(tag)}
-                  className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                    selectedTags.includes(tag)
-                      ? 'bg-primary-500 text-white shadow-sm'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-              {selectedTags.length > 0 && (
-                <button
-                  onClick={() => setSelectedTags([])}
-                  className="px-4 py-2 rounded-lg text-sm font-medium text-gray-600 hover:text-gray-900 underline"
-                >
-                  Clear filters
-                </button>
-              )}
-            </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => setSelectedTags([])}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                selectedTags.length === 0
+                  ? 'bg-primary-500 text-white shadow-sm'
+                  : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
+              }`}
+            >
+              All
+            </button>
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all capitalize ${
+                  selectedTags.includes(tag)
+                    ? 'bg-primary-500 text-white shadow-sm'
+                    : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
           </div>
         </div>
 

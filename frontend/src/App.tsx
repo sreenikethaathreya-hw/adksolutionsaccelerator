@@ -36,9 +36,25 @@ const HomePage: React.FC = () => {
     <div className="min-h-screen bg-gray-50">
       <Header />
       <div className="max-w-4xl mx-auto px-4 py-16 text-center">
-        <div className="w-20 h-20 bg-primary-500 rounded-2xl flex items-center justify-center mx-auto mb-8">
-          <span className="text-white font-bold text-3xl">H</span>
+        {/* Logo - centered */}
+        <div className="flex justify-center mb-8">
+          <img 
+            src="/images/hatchworks-logo.png" 
+            alt="HatchWorks AI" 
+            className="h-16 w-auto"
+            onError={(e) => {
+              // Fallback to H icon if logo not found
+              e.currentTarget.style.display = 'none';
+              const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+              if (fallback) fallback.classList.remove('hidden');
+            }}
+          />
+          {/* Fallback H icon (only shows if logo fails to load) */}
+          <div className="hidden w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center">
+            <span className="text-white font-bold text-2xl">H</span>
+          </div>
         </div>
+        
         <h1 className="text-5xl font-bold text-gray-900 mb-4">
           Welcome to HatchWorks<span className="text-primary-500">AI</span>
         </h1>

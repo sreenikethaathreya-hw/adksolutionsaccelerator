@@ -12,12 +12,26 @@ export const Header: React.FC = () => {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-lg">H</span>
+            {/* Logo Image - replace src with your logo path */}
+            <img 
+              src="/images/hatchworks-logo.png" 
+              alt="HatchWorks AI" 
+              className="h-8 w-auto"
+              onError={(e) => {
+                // Fallback to text logo if image not found
+                e.currentTarget.style.display = 'none';
+                e.currentTarget.nextElementSibling?.classList.remove('hidden');
+              }}
+            />
+            {/* Fallback text logo (hidden if image loads) */}
+            <div className="hidden flex items-center gap-2">
+              <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-lg">H</span>
+              </div>
+              <span className="text-xl font-bold text-gray-900">
+                HatchWorks<span className="text-primary-500">AI</span>
+              </span>
             </div>
-            <span className="text-xl font-bold text-gray-900">
-              HatchWorks<span className="text-primary-500">AI</span>
-            </span>
           </Link>
 
           {/* Navigation */}
