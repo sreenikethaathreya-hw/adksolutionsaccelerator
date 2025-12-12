@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Grid, List, Sparkles } from 'lucide-react';
+import { Search, Grid, List} from 'lucide-react';
 import { Header } from '../components/Header';
 import { AgentCard, Agent } from '../components/AgentCard';
 import { getAgents } from '../api/agents';

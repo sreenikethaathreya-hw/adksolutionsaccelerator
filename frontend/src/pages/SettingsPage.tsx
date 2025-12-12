@@ -9,7 +9,6 @@ import {
   Trash2, 
   CheckCircle,
   XCircle,
-  Settings as SettingsIcon,
   Link as LinkIcon,
   Moon,
   Sun,

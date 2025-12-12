@@ -1,6 +1,5 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Sparkles } from 'lucide-react';
 
 export interface Agent {
   id: string;
@@ -28,47 +27,7 @@ export const AgentCard: React.FC<AgentCardProps> = ({ agent }) => {
   };
 
   // Agent-specific colors
-  const getColorClasses = () => {
-    switch (agent.id) {
-      case 'financial_agent':
-        return {
-          bg: 'bg-blue-50',
-          icon: 'bg-blue-500',
-          iconHover: 'group-hover:bg-blue-600',
-          text: 'text-blue-600',
-        };
-      case 'market_agent':
-        return {
-          bg: 'bg-green-50',
-          icon: 'bg-green-500',
-          iconHover: 'group-hover:bg-green-600',
-          text: 'text-green-600',
-        };
-      case 'kpi_agent':
-        return {
-          bg: 'bg-purple-50',
-          icon: 'bg-purple-500',
-          iconHover: 'group-hover:bg-purple-600',
-          text: 'text-purple-600',
-        };
-      case 'ai_opportunity_agent':
-        return {
-          bg: 'bg-orange-50',
-          icon: 'bg-orange-500',
-          iconHover: 'group-hover:bg-orange-600',
-          text: 'text-orange-600',
-        };
-      default:
-        return {
-          bg: 'bg-primary-50',
-          icon: 'bg-primary-500',
-          iconHover: 'group-hover:bg-primary-600',
-          text: 'text-primary-600',
-        };
-    }
-  };
 
-  const colors = getColorClasses();
 
   return (
     <div
