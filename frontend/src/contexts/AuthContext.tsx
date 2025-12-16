@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
 export interface User {
   id: string;
@@ -16,14 +19,12 @@ interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-// Check if we're in mock mode
-const MOCK_AUTH = import.meta.env.VITE_MOCK_AUTH === 'true' || true; // Default to true for development
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
@@ -35,64 +36,100 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuth = async () => {
     try {
-      if (MOCK_AUTH) {
-        // Mock authentication - check localStorage for mock user
-        const mockUserData = localStorage.getItem('mock_user');
-        if (mockUserData) {
-          setUser(JSON.parse(mockUserData));
-        }
-      } else {
-        // Real authentication
-        const token = localStorage.getItem('auth_token');
-        if (token) {
-          // In real implementation, call API to get current user
-          // const userData = await getCurrentUser();
-          // setUser(userData);
-        }
+      const accessToken = localStorage.getItem('access_token');
+      
+      if (accessToken) {
+        // Get current user from API
+        const response = await axios.get(`${API_URL}/auth/me`, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+        
+        setUser(response.data);
       }
     } catch (error) {
       console.error('Auth check failed:', error);
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('mock_user');
+      // Token might be expired, try refresh
+      await tryRefreshToken();
     } finally {
       setLoading(false);
     }
   };
 
-  const login = async (email: string, _password: string) => {
-    if (MOCK_AUTH) {
-      // Mock login - create a demo user
-      const mockUser: User = {
-        id: 'user_demo_001',
-        email: email,
-        name: email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1),
-        role: 'Agent User',
-        connected_services: {
-          google: false,
-          salesforce: false,
-          sharepoint: false,
-        },
-      };
-      localStorage.setItem('mock_user', JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', 'mock_token_' + Date.now());
-      setUser(mockUser);
-    } else {
-      // Real authentication
-      // const response = await apiLogin({ email, password });
-      // localStorage.setItem('auth_token', response.access_token);
-      // setUser(response.user);
-      throw new Error('Real authentication not yet implemented');
+  const tryRefreshToken = async () => {
+    try {
+      const refreshToken = localStorage.getItem('refresh_token');
+      
+      if (!refreshToken) {
+        throw new Error('No refresh token');
+      }
+
+      const response = await axios.post(`${API_URL}/auth/refresh`, {
+        refresh_token: refreshToken
+      });
+
+      // Save new tokens
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+      setUser(response.data.user);
+    } catch (error) {
+      // Refresh failed, clear everything
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
+      setUser(null);
+    }
+  };
+
+  const login = async (email: string, password: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/login`, {
+        email,
+        password
+      });
+
+      // Save tokens
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+      setUser(response.data.user);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Login failed');
+    }
+  };
+
+  const register = async (email: string, password: string, name: string) => {
+    try {
+      const response = await axios.post(`${API_URL}/auth/register`, {
+        email,
+        password,
+        name
+      });
+
+      // Save tokens
+      localStorage.setItem('access_token', response.data.access_token);
+      localStorage.setItem('refresh_token', response.data.refresh_token);
+      setUser(response.data.user);
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Registration failed');
     }
   };
 
   const logout = async () => {
-    if (MOCK_AUTH) {
-      localStorage.removeItem('mock_user');
-      localStorage.removeItem('auth_token');
-      setUser(null);
-    } else {
-      // await apiLogout();
-      localStorage.removeItem('auth_token');
+    try {
+      const accessToken = localStorage.getItem('access_token');
+      
+      if (accessToken) {
+        await axios.post(`${API_URL}/auth/logout`, {}, {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');
       setUser(null);
     }
   };
@@ -103,6 +140,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         user,
         loading,
         login,
+        register,
         logout,
         isAuthenticated: !!user,
       }}

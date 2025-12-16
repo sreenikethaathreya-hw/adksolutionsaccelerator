@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Loader2 } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Loader2 } from 'lucide-react';
 
 export const LoginPage: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, register } = useAuth();
+  
+  const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,26 +20,38 @@ export const LoginPage: React.FC = () => {
     setLoading(true);
 
     try {
-      await login(email, password);
+      if (isLogin) {
+        await login(email, password);
+      } else {
+        if (password.length < 8) {
+          throw new Error('Password must be at least 8 characters');
+        }
+        await register(email, password, name);
+      }
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Failed to login. Please try again.');
+      setError(err.message || `Failed to ${isLogin ? 'login' : 'register'}. Please try again.`);
     } finally {
       setLoading(false);
     }
   };
 
-  // Demo login (for development)
   const handleDemoLogin = async () => {
     setError(null);
     setLoading(true);
 
     try {
-      // Mock login - bypass actual authentication
-      await login('demo@hatchworks.ai', 'demo');
+      // Try to login with demo account
+      // If it doesn't exist, create it first
+      try {
+        await login('demo@hatchworks.ai', 'demo12345');
+      } catch (loginError) {
+        // Demo account doesn't exist, create it
+        await register('demo@hatchworks.ai', 'demo12345', 'Demo User');
+      }
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Failed to login. Please try again.');
+      setError(err.message || 'Failed to access demo account. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -53,7 +68,6 @@ export const LoginPage: React.FC = () => {
               alt="HatchWorks AI" 
               className="h-16 w-auto"
               onError={(e) => {
-                // Fallback to H icon if logo not found
                 e.currentTarget.style.display = 'none';
                 const fallback = e.currentTarget.nextElementSibling as HTMLElement;
                 if (fallback) fallback.classList.remove('hidden');
@@ -68,51 +82,89 @@ export const LoginPage: React.FC = () => {
             HatchWorks<span className="text-primary-500">AI</span>
           </h1>
           <p className="text-gray-600 mt-2">
-            Sign in to your account
+            {isLogin ? 'Sign in to your account' : 'Create your account'}
           </p>
         </div>
 
-        {/* Login Card */}
+        {/* Login/Register Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <div className="bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-2">
+                <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
                 <p className="text-sm text-red-800">{error}</p>
               </div>
             )}
 
+            {/* Name field (only for registration) */}
+            {!isLogin && (
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <input
+                    id="name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="John Doe"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                    required
+                    disabled={loading}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Email field */}
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email
               </label>
-              <input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="you@example.com"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-                disabled={loading}
-              />
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                  disabled={loading}
+                />
+              </div>
             </div>
 
+            {/* Password field */}
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
               </label>
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                required
-                disabled={loading}
-              />
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  required
+                  disabled={loading}
+                  minLength={8}
+                />
+              </div>
+              {!isLogin && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Must be at least 8 characters
+                </p>
+              )}
             </div>
 
+            {/* Submit button */}
             <button
               type="submit"
               disabled={loading}
@@ -121,13 +173,28 @@ export const LoginPage: React.FC = () => {
               {loading ? (
                 <>
                   <Loader2 className="w-5 h-5 animate-spin" />
-                  Signing in...
+                  {isLogin ? 'Signing in...' : 'Creating account...'}
                 </>
               ) : (
-                'Sign In'
+                isLogin ? 'Sign In' : 'Create Account'
               )}
             </button>
           </form>
+
+          {/* Toggle between login/register */}
+          <div className="mt-4 text-center">
+            <button
+              type="button"
+              onClick={() => {
+                setIsLogin(!isLogin);
+                setError(null);
+              }}
+              disabled={loading}
+              className="text-sm text-primary-600 hover:text-primary-700 font-medium disabled:opacity-50"
+            >
+              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+            </button>
+          </div>
 
           {/* Demo Login */}
           <div className="mt-6">
@@ -149,17 +216,9 @@ export const LoginPage: React.FC = () => {
               Continue with Demo Account
             </button>
           </div>
-
-          {/* Footer */}
-          <p className="mt-6 text-center text-sm text-gray-500">
-            Don't have an account?{' '}
-            <a href="#" className="text-primary-500 hover:text-primary-600 font-medium">
-              Contact Sales
-            </a>
-          </p>
         </div>
 
-        {/* Info */}
+        {/* Footer */}
         <p className="mt-8 text-center text-sm text-gray-500">
           By signing in, you agree to our{' '}
           <a href="#" className="text-primary-500 hover:text-primary-600">

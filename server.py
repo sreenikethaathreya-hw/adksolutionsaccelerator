@@ -16,12 +16,18 @@ import os
 import logging
 import base64
 from datetime import datetime
+from api_endpoints import router as drive_router
+from drive_integration import add_drive_rag_to_financial_agent
+from auth_endpoints import router as auth_router
+from auth import get_current_user_id
 
 # Import agent
 from financial_agent.agent import root_agent
 from google.adk.runners import InMemoryRunner
 from google.genai import types
 from google import genai
+from financial_agent.agent import root_agent as financial_agent
+financial_agent_with_drive = add_drive_rag_to_financial_agent(financial_agent)
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -45,6 +51,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.include_router(auth_router)
+app.include_router(drive_router, tags=["drive"])
 
 # Initialize Gemini client with Vertex AI
 PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "hatchworks-ai-prod")
@@ -82,7 +90,7 @@ runner = None
 # Request/Response models
 class CreateSessionRequest(BaseModel):
     user_id: str
-    app_name: str = "financial_agent"
+    app_name: str = "financial_agent_with_drive"
 
 class SessionResponse(BaseModel):
     id: str
@@ -107,7 +115,7 @@ class ChatWithFileRequest(BaseModel):
 async def startup():
     global runner
     try:
-        runner = InMemoryRunner(agent=root_agent, app_name="hatchworks-ai")
+        runner = InMemoryRunner(agent=financial_agent_with_drive, app_name="hatchworks-ai")
         logger.info("✅ Agent runner initialized")
     except Exception as e:
         logger.error(f"Failed to initialize runner: {e}")
@@ -222,7 +230,7 @@ async def stream_query(request: MessageRequest):
 async def list_agents():
     return [
         {
-            "id": "financial_agent",
+            "id": "financial_agent_with_drive",
             "name": "Financial Analysis Agent",
             "description": "Analyze financial statements and provide insights",
             "tags": ["finance", "analysis"],

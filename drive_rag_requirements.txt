@@ -1,0 +1,28 @@
+# Google Drive RAG Agent Dependencies
+# Add these to your existing requirements.txt
+
+# Google OAuth and Drive API
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+google-api-python-client>=2.100.0
+
+# Google Cloud Services
+google-cloud-aiplatform>=1.38.0
+google-cloud-secret-manager>=2.16.0
+
+# Vertex AI
+vertexai>=1.38.0
+
+# If not already included:
+# fastapi>=0.104.0
+# uvicorn>=0.24.0
+# pydantic>=2.4.0
+# python-dotenv>=1.0.0
+google-auth>=2.23.0
+google-auth-oauthlib>=1.1.0
+google-auth-httplib2>=0.1.1
+google-api-python-client>=2.100.0
+google-cloud-aiplatform>=1.38.0
+google-cloud-secret-manager>=2.16.0
+vertexai>=1.38.0

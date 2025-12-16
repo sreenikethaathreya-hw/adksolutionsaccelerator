@@ -7,6 +7,7 @@ import { LoginPage } from './pages/LoginPage';
 import { ChatPage } from './pages/ChatPage';
 import { AgentCatalogPage } from './pages/AgentCatalogPage';
 import { SettingsPage } from './pages/SettingsPage';
+import OAuthCallback from './pages/OAuthCallback';
 
 // Protected Route wrapper
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -164,7 +165,14 @@ function App() {
                 </ProtectedRoute>
               }
             />
-
+            <Route
+              path="/auth/callback"
+              element={
+                <ProtectedRoute>
+                  <OAuthCallback />
+                </ProtectedRoute>
+              }
+            />
             {/* Catch all - redirect to home */}
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>

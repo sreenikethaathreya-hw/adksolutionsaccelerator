@@ -8,7 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
-
+from api_endpoints import router as drive_router
 # Lazy loading for faster cold starts
 _adk_app = None
 
@@ -35,7 +35,7 @@ app = FastAPI(
     docs_url="/docs" if os.getenv("ENABLE_DOCS") else None,
     redoc_url=None,
 )
-
+app.include_router(drive_router)
 # CORS configuration from environment
 ENVIRONMENT = os.getenv("ENVIRONMENT", "development")
 if ENVIRONMENT == "production":

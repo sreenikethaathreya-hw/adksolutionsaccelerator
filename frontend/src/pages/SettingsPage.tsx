@@ -15,6 +15,7 @@ import {
   Globe,
   LogOut,
 } from 'lucide-react';
+import GoogleDriveSettings from '../components/GoogleDriveSettings';
 
 interface ConnectedService {
   id: string;
@@ -259,6 +260,7 @@ export const SettingsPage: React.FC = () => {
             {/* Services Tab */}
             {activeTab === 'services' && (
               <div className="space-y-6">
+                <GoogleDriveSettings />
                 {/* Connected Services */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
                   <h2 className="text-xl font-semibold text-gray-900 mb-2 flex items-center gap-2">

@@ -1,0 +1,17 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '--build-arg'
+      - 'VITE_API_URL=$_VITE_API_URL'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/hatchworks-ai-frontend'
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/hatchworks-ai-frontend']
+
+images:
+  - 'gcr.io/$PROJECT_ID/hatchworks-ai-frontend'
+
+substitutions:
+  _VITE_API_URL: 'https://hatchworks-ai-backend-2lavryrela-uc.a.run.app'
