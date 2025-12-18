@@ -1,34 +1,51 @@
 [project]
-name = "financial-agent"
-version = "0.1.0"
-description = "AI-powered financial analysis and research agent"
+name = "hatchworks-ai"
+version = "1.0.0"
+description = "AI-powered financial analysis platform with multi-agent system"
 authors = [
-    {name = "Your Name", email = "your.email@example.com"}
+    {name = "HatchWorks", email = "info@hatchworks.ai"}
 ]
 license = {text = "Apache-2.0"}
 readme = "README.md"
 requires-python = ">=3.10,<3.13"
+
 dependencies = [
+    # Google ADK and AI Platform
     "google-cloud-aiplatform[adk,agent-engines]>=1.93.0",
     "google-adk>=1.0.0",
+    "google-genai>=1.0.0",
+    # FastAPI Backend
+    "fastapi>=0.115.5",
+    "uvicorn[standard]>=0.32.1",
+    "python-multipart>=0.0.9",
+    # Authentication
+    "python-jose[cryptography]==3.3.0",
+    "passlib[bcrypt]==1.7.4",
+    "bcrypt==3.2.2",
+    "email-validator>=2.2.0",
+    # Google Cloud Services
+    "google-cloud-firestore>=2.19.0",
+    "google-cloud-secret-manager>=2.20.0",
+    "google-cloud-storage>=2.18.2",
+    # Google OAuth & Drive
+    "google-auth>=2.36.0",
+    "google-auth-httplib2>=0.2.0",
+    "google-auth-oauthlib>=1.2.1",
+    "google-api-python-client>=2.154.0",
+    # Data Processing
     "pydantic>=2.10.6",
     "pydantic-settings>=2.8.1",
     "python-dotenv>=1.0.1",
-    "tabulate>=0.9.0",
-    "google-auth>=2.36.0",
-    "requests>=2.32.3",
-    "google-cloud-secret-manager>=2.20.0",
-    "google-cloud-storage>=2.18.2",
-    "pg8000>=1.31.0",
-    "cloud-sql-python-connector[pg8000]>=1.11.0",
-    "fastapi>=0.118.3",
-    "uvicorn[standard]>=0.38.0",
-    "pypdf2>=3.0.1",
     "pandas>=2.3.3",
+    "openpyxl>=3.1.5",
+    # PDF & Image Processing
+    "pypdf2>=3.0.1",
     "pillow>=12.0.0",
     "pytesseract>=0.3.13",
-    "openpyxl>=3.1.5",
-    "python-multipart>=0.0.20",
+    # Utilities
+    "tabulate>=0.9.0",
+    "requests>=2.32.3",
+    "firebase-admin>=7.1.0",
 ]
 
 [dependency-groups]
@@ -36,7 +53,7 @@ dev = [
     "pytest>=8.3.5",
     "pytest-asyncio>=0.26.0",
     "pytest-mock>=3.14.0",
-    "agent-starter-pack>=0.14.1",
+    "httpx>=0.24.0",
 ]
 
 deployment = [
@@ -47,7 +64,6 @@ deployment = [
 lint = [
     "ruff>=0.4.6",
     "mypy>=1.15.0",
-    "codespell>=2.2.0",
 ]
 
 [tool.ruff]
@@ -60,29 +76,24 @@ select = [
     "F",   # pyflakes
     "W",   # pycodestyle warnings
     "I",   # isort
-    "C",   # flake8-comprehensions
-    "B",   # flake8-bugbear
-    "UP",  # pyupgrade
-    "RUF", # ruff specific rules
 ]
-ignore = ["E501", "C901"]
-
-[tool.ruff.lint.isort]
-known-first-party = ["financial_agent"]
+ignore = ["E501"]
 
 [tool.pytest.ini_options]
-pythonpath = "."
+pythonpath = ["."]
+testpaths = ["tests"]
 asyncio_default_fixture_loop_scope = "function"
 
+# ⚠️ FIXED: No package structure required anymore
 [build-system]
-requires = ["uv_build>=0.8.14,<0.9.0"]
-build-backend = "uv_build"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
-[tool.uv.build-backend]
-module-root = ""
+[tool.setuptools]
+# Don't treat as a package - just install dependencies
+py-modules = []
 
-[tool.agent-starter-pack]
-example_question = "Analyze the financial health of Company XYZ"
-
-[tool.agent-starter-pack.settings]
-agent_directory = "financial_agent"
+[tool.setuptools.packages.find]
+# Don't auto-discover packages
+where = ["."]
+include = []

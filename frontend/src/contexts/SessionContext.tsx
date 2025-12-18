@@ -1,6 +1,16 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Session, createSession as apiCreateSession, deleteSession as apiDeleteSession } from '../api/agents';
+import { createSession as apiCreateSession, deleteSession as apiDeleteSession } from '../api/agents';
 import { useAuth } from './AuthContext';
+
+interface Session {
+  id: string;
+  userId: string;
+  agentId: string;
+  title: string;
+  createdAt: string;
+  updatedAt: string;
+  messageCount: number;
+}
 
 interface SessionContextType {
   session: Session | null;
@@ -21,8 +31,9 @@ export const SessionProvider: React.FC<{ children: React.ReactNode }> = ({ child
     
     setLoading(true);
     try {
-      const newSession = await apiCreateSession(user.id, agentId);
-      setSession(newSession);
+      // Only pass agentId - user authentication is handled by Firebase token
+      const response = await apiCreateSession(agentId);
+      setSession(response.data);
     } catch (error) {
       console.error('Failed to create session:', error);
       throw error;

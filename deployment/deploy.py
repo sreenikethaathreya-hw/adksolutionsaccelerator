@@ -17,6 +17,14 @@
 import os
 import vertexai
 from absl import app, flags
+
+import sys
+from pathlib import Path
+
+# Add agents to path
+agents_path = Path(__file__).parent.parent / "agents"
+sys.path.insert(0, str(agents_path))
+
 from financial_agent.agent import root_agent
 from dotenv import load_dotenv, set_key
 from vertexai import agent_engines
@@ -62,7 +70,7 @@ def create() -> None:
             "google-cloud-secret-manager>=2.20.0",
             "google-cloud-storage>=2.18.2",
         ],
-        extra_packages=["./financial_agent"],
+        extra_packages=["./agents/financial_agent"],
     )
     
     print(f"Created remote agent: {remote_agent.resource_name}")
