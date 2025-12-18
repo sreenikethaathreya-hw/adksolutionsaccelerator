@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Paperclip } from 'lucide-react';
+import { Navbar } from '../components/Navbar';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -30,40 +31,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            {/* Logo */}
-            <div className="flex items-center gap-2">
-              <img 
-                src="/images/hatchworks-logo.png" 
-                alt="HatchWorks AI" 
-                className="h-8 w-auto"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.classList.remove('hidden');
-                }}
-              />
-              {/* Fallback */}
-              <div className="hidden flex items-center gap-2">
-                <div className="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">H</span>
-                </div>
-                <span className="text-xl font-bold text-gray-900">
-                  HatchWorks<span className="text-primary-500">AI</span>
-                </span>
-              </div>
-            </div>
-
-            {/* User Icon */}
-            <a href="/settings" className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center text-white font-medium hover:bg-gray-800 transition-colors">
-              A
-            </a>
-          </div>
-        </div>
-      </header>
+      <Navbar />
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center px-4 py-12">

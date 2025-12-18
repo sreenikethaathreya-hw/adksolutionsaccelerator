@@ -5,12 +5,14 @@ from google.cloud import firestore
 from typing import Optional, Dict, Any
 import os
 import logging
-from auth import get_password_hash, verify_password
+from datetime import datetime
+
+from backend.auth.utils import get_password_hash, verify_password
 
 logger = logging.getLogger(__name__)
 
 # Initialize Firestore
-PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT", "adksolutionsaccelerator")
+PROJECT_ID = os.getenv("GOOGLE_CLOUD_PROJECT")
 db = firestore.Client(project=PROJECT_ID)
 
 
@@ -35,8 +37,6 @@ class UserService:
         Raises:
             ValueError: If user already exists
         """
-        from datetime import datetime
-        
         # Check if user exists
         existing_user = UserService.get_user_by_email(email)
         if existing_user:
@@ -46,7 +46,6 @@ class UserService:
         user_ref = db.collection(UserService.COLLECTION).document()
         user_id = user_ref.id
         
-        # Use actual datetime instead of SERVER_TIMESTAMP for return value
         now = datetime.utcnow().isoformat()
         
         user_data = {
@@ -55,8 +54,8 @@ class UserService:
             "hashed_password": get_password_hash(password),
             "name": name,
             "role": "user",
-            "created_at": now,  # ← Changed to ISO string
-            "updated_at": now,  # ← Changed to ISO string
+            "created_at": now,
+            "updated_at": now,
             "connected_services": {
                 "google": False,
                 "salesforce": False,
@@ -113,11 +112,9 @@ class UserService:
     @staticmethod
     def update_user(user_id: str, updates: Dict[str, Any]) -> bool:
         """Update user data"""
-        from datetime import datetime
-        
         try:
             doc_ref = db.collection(UserService.COLLECTION).document(user_id)
-            updates["updated_at"] = datetime.utcnow().isoformat()  # ← Changed to ISO string
+            updates["updated_at"] = datetime.utcnow().isoformat()
             doc_ref.update(updates)
             logger.info(f"Updated user: {user_id}")
             return True

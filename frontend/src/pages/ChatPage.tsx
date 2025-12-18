@@ -1,88 +1,79 @@
-import React, { useEffect } from 'react';
-import { useParams, useLocation, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Sparkles } from 'lucide-react';
+import React, { useState } from 'react';
 import { ChatInterface } from '../components/ChatInterface';
-import { useSession } from '../contexts/SessionContext';
-import { useAuth } from '../contexts/AuthContext';
+import { ChatHistory } from '../components/ChatHistory';
+import { Navbar } from '../components/Navbar';
+import { apiClient } from '../services/api';
+import { Menu } from 'lucide-react';
 
 export const ChatPage: React.FC = () => {
-  const { agentId } = useParams<{ agentId?: string }>();
-  const location = useLocation();
-  const navigate = useNavigate();
-  const { session, createSession, loading } = useSession();
-  const { user } = useAuth();
+  const [selectedSessionId, setSelectedSessionId] = useState<string | undefined>();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  // Get initial message from navigation state
-  const initialMessage = location.state?.initialMessage;
-
-  useEffect(() => {
-    // Create session if none exists
-    if (!session && user && !loading) {
-      createSession(agentId || 'financial_agent').catch((error) => {
-        console.error('Failed to create session:', error);
-      });
-    }
-  }, [session, user, loading, agentId, createSession]);
-
-  const agentNames: Record<string, string> = {
-    financial_agent: 'Financial Insights Agent',
-    market_agent: 'Market Research Agent',
-    ai_opportunity_agent: 'AI Opportunity Agent',
-    kpi_agent: 'KPI & Indicators Agent',
+  const handleSelectSession = (sessionId: string) => {
+    setSelectedSessionId(sessionId);
   };
 
-  const agentName = agentNames[agentId || 'financial_agent'] || 'Financial Agent';
+  const handleNewChat = async () => {
+    try {
+      // Create a brand new session
+      const response = await apiClient.post('/sessions', {
+        agentId: 'financial_agent'
+      });
+      
+      const newSessionId = response.data.id;
+      console.log('✅ Created new session:', newSessionId);
+      
+      // Select the new session
+      setSelectedSessionId(newSessionId);
+      setRefreshKey(prev => prev + 1);
+    } catch (error) {
+      console.error('Failed to create new session:', error);
+      // Fallback to clearing selection
+      setSelectedSessionId(undefined);
+      setRefreshKey(prev => prev + 1);
+    }
+  };
 
-  if (loading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
-          <p className="text-gray-600">Starting conversation...</p>
-        </div>
-      </div>
-    );
-  }
+  const handleSessionChange = () => {
+    setRefreshKey(prev => prev + 1);
+  };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
-      {/* Chat Header */}
-      <div className="bg-white border-b border-gray-200 px-4 py-3">
-        <div className="max-w-7xl mx-auto flex items-center gap-4">
+    <div className="flex flex-col h-screen bg-gray-50">
+      <Navbar />
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar Toggle Button - Only visible when sidebar is closed */}
+        {!sidebarOpen && (
           <button
-            onClick={() => navigate('/catalog')}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            onClick={() => setSidebarOpen(true)}
+            className="absolute top-20 left-4 z-50 p-2 bg-white border border-gray-200 rounded-lg shadow-sm hover:bg-gray-50 transition-colors"
+            title="Show conversations"
           >
-            <ArrowLeft className="w-5 h-5 text-gray-600" />
+            <Menu className="w-5 h-5 text-gray-700" />
           </button>
+        )}
 
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary-100 rounded-lg flex items-center justify-center">
-              <Sparkles className="w-5 h-5 text-primary-600" />
-            </div>
-            <div>
-              <h1 className="font-semibold text-gray-900">{agentName}</h1>
-              <p className="text-sm text-gray-500">
-                {session ? 'Connected' : 'Initializing...'}
-              </p>
-            </div>
+        {/* Chat History Sidebar */}
+        {sidebarOpen && (
+          <div className="w-80 border-r border-gray-200 bg-white">
+            <ChatHistory
+              key={refreshKey}
+              currentSessionId={selectedSessionId}
+              onSelectSession={handleSelectSession}
+              onNewChat={handleNewChat}
+              isOpen={sidebarOpen}
+              onToggle={() => setSidebarOpen(!sidebarOpen)}
+            />
           </div>
-        </div>
-      </div>
+        )}
 
-      {/* Chat Interface */}
-      <div className="flex-1 overflow-hidden">
-        <div className="h-full max-w-5xl mx-auto">
-          {session ? (
-            <ChatInterface initialMessage={initialMessage} />
-          ) : (
-            <div className="h-full flex items-center justify-center">
-              <div className="text-center">
-                <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mb-4"></div>
-                <p className="text-gray-600">Connecting to agent...</p>
-              </div>
-            </div>
-          )}
+        {/* Main Chat Area */}
+        <div className="flex-1 overflow-hidden">
+          <ChatInterface
+            selectedSessionId={selectedSessionId}
+            onSessionChange={handleSessionChange}
+          />
         </div>
       </div>
     </div>

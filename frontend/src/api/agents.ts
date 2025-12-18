@@ -1,125 +1,124 @@
-import apiClient from './client';
+import axios from 'axios';
+import { auth } from '../config/firebase';
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true,
+});
+
+// Request interceptor to add Firebase ID token
+api.interceptors.request.use(
+  async (config) => {
+    const user = auth.currentUser;
+    
+    if (user) {
+      try {
+        const token = await user.getIdToken();
+        config.headers.Authorization = `Bearer ${token}`;
+      } catch (error) {
+        console.error('Error getting ID token:', error);
+      }
+    }
+    
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor for token refresh
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      
+      const user = auth.currentUser;
+      if (user) {
+        try {
+          const token = await user.getIdToken(true);
+          originalRequest.headers.Authorization = `Bearer ${token}`;
+          return api(originalRequest);
+        } catch (refreshError) {
+          console.error('Token refresh failed:', refreshError);
+        }
+      }
+    }
+    
+    return Promise.reject(error);
+  }
+);
+
+// Agent type matching AgentCard expectations
 export interface Agent {
   id: string;
   name: string;
   description: string;
   tags: string[];
   icon?: string;
+  color?: string;
 }
 
-export interface Message {
-  id: string;
-  role: 'user' | 'assistant' | 'system';
-  content: string;
-  timestamp: string;
-  metadata?: any;
-}
+// Session management
+export const createSession = (agentId: string, title?: string) =>
+  api.post('/sessions', { app_name: agentId, title });
 
-export interface Session {
-  id: string;
-  user_id: string;
-  agent_id: string;
-  created_at: string;
-  updated_at: string;
-  state?: any;
-}
+export const listSessions = () =>
+  api.get('/sessions');
 
-// Get all available agents
+export const getSession = (sessionId: string) =>
+  api.get(`/sessions/${sessionId}`);
+
+export const deleteSession = (sessionId: string) =>
+  api.delete(`/sessions/${sessionId}`);
+
+export const updateSession = (sessionId: string, updates: any) =>
+  api.patch(`/sessions/${sessionId}`, updates);
+
+// Agent management
 export const getAgents = async (): Promise<Agent[]> => {
-  const response = await apiClient.get('/agents');
-  return response.data;
-};
-
-// Get specific agent details
-export const getAgent = async (agentId: string): Promise<Agent> => {
-  const response = await apiClient.get(`/agents/${agentId}`);
-  return response.data;
-};
-
-// Create new session
-export const createSession = async (
-  userId: string,
-  agentId: string = 'financial_agent'
-): Promise<Session> => {
-  const response = await apiClient.post('/sessions', {
-    user_id: userId,
-    app_name: agentId,
-  });
-  return response.data;
-};
-
-// Send message to agent
-export const sendMessage = async (
-  sessionId: string,
-  message: string
-): Promise<ReadableStream> => {
-  const response = await fetch(
-    `${apiClient.defaults.baseURL}/agents/financial_agent/stream_query`,
+  return [
     {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`,
-      },
-      body: JSON.stringify({
-        session_id: sessionId,
-        message: message,
-      }),
+      id: 'financial_agent',
+      name: 'Financial Analyst',
+      description: 'Analyze financial statements, P&L, balance sheets, and cash flow with AI-powered insights',
+      tags: ['Finance', 'P&L Analysis', 'Balance Sheet', 'Cash Flow'],
+      icon: '📊',
+      color: 'blue'
+    },
+    {
+      id: 'drive_rag_agent',
+      name: 'Drive RAG Assistant',
+      description: 'Search and analyze documents from your Google Drive using advanced retrieval',
+      tags: ['Productivity', 'Document Search', 'Knowledge Base', 'Google Drive'],
+      icon: '📁',
+      color: 'green'
     }
-  );
-  
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
-  }
-  
-  return response.body!;
+  ];
 };
 
-// Parse SSE stream
-export async function* parseSSEStream(
-  stream: ReadableStream
-): AsyncGenerator<any> {
-  const reader = stream.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
-
-  try {
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop() || '';
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          if (data === '[DONE]') continue;
-          
-          try {
-            yield JSON.parse(data);
-          } catch (e) {
-            console.error('Failed to parse SSE data:', e);
-          }
-        }
-      }
-    }
-  } finally {
-    reader.releaseLock();
-  }
-}
-
-// Get session history
-export const getSessionHistory = async (
-  sessionId: string
-): Promise<Message[]> => {
-  const response = await apiClient.get(`/sessions/${sessionId}/history`);
-  return response.data;
+export const getAgent = async (agentId: string): Promise<Agent | null> => {
+  const agents = await getAgents();
+  return agents.find(a => a.id === agentId) || null;
 };
 
-// Delete session
-export const deleteSession = async (sessionId: string): Promise<void> => {
-  await apiClient.delete(`/sessions/${sessionId}`);
-};
+// Chat/Messages
+export const sendMessage = (sessionId: string, message: string, agentId: string) =>
+  api.post('/api/chat', { session_id: sessionId, message, agent_id: agentId });
+
+export const getMessages = (sessionId: string) =>
+  api.get(`/sessions/${sessionId}/messages`);
+
+// Health check
+export const healthCheck = () => api.get('/health');
+
+export default api;

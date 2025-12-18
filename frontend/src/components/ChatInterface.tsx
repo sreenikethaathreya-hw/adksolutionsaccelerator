@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, Paperclip, X, Bot, User, AlertCircle, FileText, Image, Table } from 'lucide-react';
 import { useSession } from '../contexts/SessionContext';
+import { auth } from '../config/firebase';
+import { apiClient } from '../services/api';
 import axios from 'axios';
 
 interface Message {
@@ -19,7 +21,15 @@ interface FileData {
   mime_type: string;
 }
 
-export const ChatInterface: React.FC = () => {
+interface ChatInterfaceProps {
+  selectedSessionId?: string;
+  onSessionChange?: () => void;
+}
+
+export const ChatInterface: React.FC<ChatInterfaceProps> = ({
+  selectedSessionId,
+  onSessionChange,
+}) => {
   const { session, createSession } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -27,16 +37,53 @@ export const ChatInterface: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [attachedFiles, setAttachedFiles] = useState<FileData[]>([]);
   const [uploadingFile, setUploadingFile] = useState(false);
+  const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
+  // Load messages when selectedSessionId changes
   useEffect(() => {
-    if (!session) {
+    const loadSessionMessages = async () => {
+      if (!selectedSessionId) {
+        setMessages([]);
+        setAttachedFiles([]);
+        return;
+      }
+
+      setLoadingMessages(true);
+      try {
+        // Load messages
+        const response = await apiClient.get(`/sessions/${selectedSessionId}/messages`);
+        const loadedMessages = response.data.map((msg: any) => ({
+          ...msg,
+          timestamp: new Date(msg.timestamp),
+        }));
+        setMessages(loadedMessages);
+
+        // Load session files
+        const sessionResponse = await apiClient.get(`/sessions/${selectedSessionId}`);
+        const sessionFiles = sessionResponse.data.files || [];
+        setAttachedFiles(sessionFiles);
+        
+        console.log(`✅ Loaded ${loadedMessages.length} messages and ${sessionFiles.length} files`);
+      } catch (err) {
+        console.error('Failed to load messages:', err);
+        setError('Failed to load conversation');
+      } finally {
+        setLoadingMessages(false);
+      }
+    };
+
+    loadSessionMessages();
+  }, [selectedSessionId]);
+
+  useEffect(() => {
+    if (!session && !selectedSessionId) {
       createSession();
     }
-  }, [session, createSession]);
+  }, [session, selectedSessionId, createSession]);
 
   useEffect(() => {
     scrollToBottom();
@@ -44,6 +91,15 @@ export const ChatInterface: React.FC = () => {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const getAuthHeaders = async () => {
+    const user = auth.currentUser;
+    if (!user) throw new Error('Not authenticated');
+    const token = await user.getIdToken();
+    return {
+      'Authorization': `Bearer ${token}`,
+    };
   };
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -63,14 +119,24 @@ export const ChatInterface: React.FC = () => {
     formData.append('file', file);
 
     try {
-      const response = await axios.post(`${API_URL}/upload`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+      const authHeaders = await getAuthHeaders();
+      
+      const currentSessionId = selectedSessionId || session?.id;
+      const response = await axios.post(
+        `${API_URL}/upload?session_id=${currentSessionId || ''}`, 
+        formData, 
+        {
+          headers: {
+            ...authHeaders,
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
 
       setAttachedFiles(prev => [...prev, response.data]);
       console.log('File uploaded:', response.data.filename);
+      
+      if (onSessionChange) onSessionChange();
     } catch (err: any) {
       console.error('Upload error:', err);
       setError(err.response?.data?.detail || 'Failed to upload file');
@@ -84,7 +150,8 @@ export const ChatInterface: React.FC = () => {
   };
 
   const handleSend = async () => {
-    if ((!input.trim() && attachedFiles.length === 0) || !session || isLoading) return;
+    const currentSessionId = selectedSessionId || session?.id;
+    if ((!input.trim() && attachedFiles.length === 0) || !currentSessionId || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -100,146 +167,73 @@ export const ChatInterface: React.FC = () => {
     setError(null);
 
     try {
-      // If files attached, use file endpoint
-      if (attachedFiles.length > 0) {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: '',
-          timestamp: new Date(),
-        };
+      const authHeaders = await getAuthHeaders();
 
-        setMessages(prev => [...prev, assistantMessage]);
+      // Always use regular chat endpoint (files are in session now)
+      const response = await fetch(`${API_URL}/api/chat/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...authHeaders,
+        },
+        body: JSON.stringify({
+          session_id: currentSessionId,
+          message: input || userMessage.content
+        })
+      });
 
-        // Use first file
-        const file = attachedFiles[0];
-        
-        const response = await fetch(`${API_URL}/agents/financial_agent/chat-with-file`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            session_id: session.id,
-            message: input || `Please analyze this file: ${file.filename}`,
-            file_data: file.base64_data,
-            file_mime_type: file.mime_type,
-            file_name: file.filename
-          })
-        });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        role: 'assistant',
+        content: '',
+        timestamp: new Date(),
+      };
 
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
+      setMessages(prev => [...prev, assistantMessage]);
 
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
 
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n');
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
 
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') break;
+          const chunk = decoder.decode(value);
+          const lines = chunk.split('\n');
 
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.error) {
-                    setError(parsed.error);
-                    break;
-                  }
-                  if (parsed.content?.parts) {
-                    for (const part of parsed.content.parts) {
-                      if (part.text) {
-                        assistantMessage.content += part.text;
-                        setMessages(prev =>
-                          prev.map(msg =>
-                            msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-                          )
-                        );
-                      }
+          for (const line of lines) {
+            if (line.startsWith('data: ')) {
+              const data = line.slice(6);
+              if (data === '[DONE]') break;
+
+              try {
+                const parsed = JSON.parse(data);
+                if (parsed.content?.parts) {
+                  for (const part of parsed.content.parts) {
+                    if (part.text) {
+                      assistantMessage.content += part.text;
+                      setMessages(prev =>
+                        prev.map(msg =>
+                          msg.id === assistantMessage.id ? { ...assistantMessage } : msg
+                        )
+                      );
                     }
                   }
-                } catch (e) {
-                  // Ignore JSON parse errors
                 }
-              }
-            }
-          }
-        }
-
-        // Clear attachments after sending
-        setAttachedFiles([]);
-      } else {
-        // Regular message without files
-        const response = await fetch(`${API_URL}/agents/financial_agent/stream_query`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            session_id: session.id,
-            message: input
-          })
-        });
-
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-        }
-
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: '',
-          timestamp: new Date(),
-        };
-
-        setMessages(prev => [...prev, assistantMessage]);
-
-        const reader = response.body?.getReader();
-        const decoder = new TextDecoder();
-
-        if (reader) {
-          while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value);
-            const lines = chunk.split('\n');
-
-            for (const line of lines) {
-              if (line.startsWith('data: ')) {
-                const data = line.slice(6);
-                if (data === '[DONE]') break;
-
-                try {
-                  const parsed = JSON.parse(data);
-                  if (parsed.content?.parts) {
-                    for (const part of parsed.content.parts) {
-                      if (part.text) {
-                        assistantMessage.content += part.text;
-                        setMessages(prev =>
-                          prev.map(msg =>
-                            msg.id === assistantMessage.id ? { ...assistantMessage } : msg
-                          )
-                        );
-                      }
-                    }
-                  }
-                } catch (e) {
-                  // Ignore parse errors
-                }
+              } catch (e) {
+                // Ignore parse errors
               }
             }
           }
         }
       }
+
+      if (onSessionChange) onSessionChange();
 
     } catch (err: any) {
       setError(err.message || 'Failed to send message');
@@ -269,10 +263,23 @@ export const ChatInterface: React.FC = () => {
     }
   };
 
-  if (!session) {
+  const currentSessionId = selectedSessionId || session?.id;
+
+  if (!currentSessionId) {
     return (
       <div className="flex items-center justify-center h-full">
         <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+      </div>
+    );
+  }
+
+  if (loadingMessages) {
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="text-center">
+          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mx-auto mb-2" />
+          <p className="text-gray-600">Loading conversation...</p>
+        </div>
       </div>
     );
   }
@@ -288,7 +295,7 @@ export const ChatInterface: React.FC = () => {
               Start a conversation
             </h3>
             <p className="text-gray-600 mb-4">
-              Upload documents and ask questions powered by Gemini
+              Upload financial documents and ask questions
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}
@@ -319,7 +326,6 @@ export const ChatInterface: React.FC = () => {
                     : 'bg-white border border-gray-200'
                 }`}
               >
-                {/* Attachments */}
                 {message.attachments && message.attachments.length > 0 && (
                   <div className="mb-2 space-y-1">
                     {message.attachments.map((file, idx) => (
@@ -386,7 +392,7 @@ export const ChatInterface: React.FC = () => {
       {attachedFiles.length > 0 && (
         <div className="border-t border-gray-200 bg-white p-3">
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="text-sm text-gray-600">Attached:</span>
+            <span className="text-sm text-gray-600">Files in session:</span>
             {attachedFiles.map((file, idx) => (
               <div
                 key={idx}
@@ -441,7 +447,7 @@ export const ChatInterface: React.FC = () => {
             onKeyPress={handleKeyPress}
             placeholder={
               attachedFiles.length > 0
-                ? "Ask about the uploaded files..."
+                ? "Ask about the files..."
                 : "Type your message..."
             }
             rows={1}

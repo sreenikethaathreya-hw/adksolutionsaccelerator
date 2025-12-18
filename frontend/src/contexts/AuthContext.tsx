@@ -1,7 +1,15 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import axios from 'axios';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import {
+  User as FirebaseUser,
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  GoogleAuthProvider,
+  signOut as firebaseSignOut,
+  onAuthStateChanged,
+  updateProfile,
+} from 'firebase/auth';
+import { auth } from '../config/firebase';
 
 export interface User {
   id: string;
@@ -22,6 +30,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => Promise<void>;
   isAuthenticated: boolean;
+  loginWithGoogle?: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -31,106 +40,69 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const accessToken = localStorage.getItem('access_token');
-      
-      if (accessToken) {
-        // Get current user from API
-        const response = await axios.get(`${API_URL}/auth/me`, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
+    // Listen to Firebase auth state changes
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        // Convert Firebase user to our User interface
+        setUser({
+          id: firebaseUser.uid,
+          email: firebaseUser.email || '',
+          name: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'User',
+          role: 'user',
+          connected_services: {},
         });
-        
-        setUser(response.data);
+      } else {
+        setUser(null);
       }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      // Token might be expired, try refresh
-      await tryRefreshToken();
-    } finally {
       setLoading(false);
-    }
-  };
+    });
 
-  const tryRefreshToken = async () => {
-    try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      
-      if (!refreshToken) {
-        throw new Error('No refresh token');
-      }
-
-      const response = await axios.post(`${API_URL}/auth/refresh`, {
-        refresh_token: refreshToken
-      });
-
-      // Save new tokens
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('refresh_token', response.data.refresh_token);
-      setUser(response.data.user);
-    } catch (error) {
-      // Refresh failed, clear everything
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      setUser(null);
-    }
-  };
+    return unsubscribe;
+  }, []);
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/login`, {
-        email,
-        password
-      });
-
-      // Save tokens
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('refresh_token', response.data.refresh_token);
-      setUser(response.data.user);
+      await signInWithEmailAndPassword(auth, email, password);
+      // User state will be updated by onAuthStateChanged
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Login failed');
+      console.error('Login error:', error);
+      throw new Error(error.message || 'Login failed');
     }
   };
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      const response = await axios.post(`${API_URL}/auth/register`, {
-        email,
-        password,
-        name
-      });
-
-      // Save tokens
-      localStorage.setItem('access_token', response.data.access_token);
-      localStorage.setItem('refresh_token', response.data.refresh_token);
-      setUser(response.data.user);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      
+      // Update profile with display name
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, { displayName: name });
+      }
+      
+      // User state will be updated by onAuthStateChanged
     } catch (error: any) {
-      throw new Error(error.response?.data?.detail || 'Registration failed');
+      console.error('Registration error:', error);
+      throw new Error(error.message || 'Registration failed');
+    }
+  };
+
+  const loginWithGoogle = async () => {
+    try {
+      const provider = new GoogleAuthProvider();
+      await signInWithPopup(auth, provider);
+      // User state will be updated by onAuthStateChanged
+    } catch (error: any) {
+      console.error('Google login error:', error);
+      throw new Error(error.message || 'Google login failed');
     }
   };
 
   const logout = async () => {
     try {
-      const accessToken = localStorage.getItem('access_token');
-      
-      if (accessToken) {
-        await axios.post(`${API_URL}/auth/logout`, {}, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`
-          }
-        });
-      }
+      await firebaseSignOut(auth);
+      // User state will be updated by onAuthStateChanged
     } catch (error) {
       console.error('Logout error:', error);
-    } finally {
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      setUser(null);
     }
   };
 
@@ -142,6 +114,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         register,
         logout,
+        loginWithGoogle,
         isAuthenticated: !!user,
       }}
     >
