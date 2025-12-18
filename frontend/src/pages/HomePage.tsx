@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Paperclip } from 'lucide-react';
-import { Navbar } from '../components/Navbar';
+import { Search, ArrowRight, TrendingUp, LineChart, Target, Lightbulb, Shield, Zap } from 'lucide-react';
+import { Header } from '../components/Header';
 
 export const HomePage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,97 +14,197 @@ export const HomePage: React.FC = () => {
     }
   };
 
-  const exampleQueries = [
+  const useCases = [
     {
+      icon: <LineChart className="w-6 h-6 text-primary-500" />,
       title: 'Financial Analysis',
-      query: 'Analyze Q4 financials for TechCorp with $5M revenue, $4M expenses',
+      description: 'Analyze P&L statements, balance sheets, and cash flow with AI-powered insights',
+      example: 'Analyze Q4 financials for TechCorp with $5M revenue',
+      color: 'bg-blue-50',
     },
     {
+      icon: <TrendingUp className="w-6 h-6 text-primary-500" />,
       title: 'Market Research',
-      query: 'What are the top trends in fintech for 2024?',
+      description: 'Track industry trends, competitive landscape, and market opportunities',
+      example: 'What are the top trends in fintech for 2024?',
+      color: 'bg-green-50',
     },
     {
+      icon: <Target className="w-6 h-6 text-primary-500" />,
       title: 'KPI Development',
-      query: 'Generate 5 KPIs for a SaaS company with 1000 customers',
+      description: 'Generate custom KPIs and performance indicators for your business',
+      example: 'Generate 5 KPIs for a SaaS company with 1000 customers',
+      color: 'bg-purple-50',
+    },
+    {
+      icon: <Lightbulb className="w-6 h-6 text-primary-500" />,
+      title: 'AI Opportunity Identification',
+      description: 'Discover AI use cases and opportunities specific to your industry',
+      example: 'Find AI opportunities for retail banking operations',
+      color: 'bg-yellow-50',
+    },
+    {
+      icon: <Shield className="w-6 h-6 text-primary-500" />,
+      title: 'Risk Assessment',
+      description: 'Evaluate business risks and develop mitigation strategies',
+      example: 'Assess risks for expanding into European markets',
+      color: 'bg-red-50',
+    },
+    {
+      icon: <Zap className="w-6 h-6 text-primary-500" />,
+      title: 'Process Automation',
+      description: 'Identify processes that can be automated to improve efficiency',
+      example: 'Which manual processes can we automate in finance?',
+      color: 'bg-teal-50',
     },
   ];
 
-  return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <Navbar />
+  const quickExamples = [
+    'Analyze customer churn patterns',
+    'Compare our pricing to competitors',
+    'Generate financial forecast for next quarter',
+    'Identify cost reduction opportunities',
+    'Evaluate market entry strategy',
+  ];
 
-      {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-4 py-12">
-        <div className="w-full max-w-3xl">
-          {/* Logo and Heading */}
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center gap-3 mb-6">
-              <img 
-                src="/images/hatchworks-logo.png" 
-                alt="HatchWorks AI" 
-                className="h-16 w-auto"
-                onError={(e) => {
-                  e.currentTarget.style.display = 'none';
-                  const fallback = e.currentTarget.nextElementSibling as HTMLElement;
-                  if (fallback) fallback.classList.remove('hidden');
-                }}
-              />
-              {/* Fallback */}
-              <div className="hidden flex items-center gap-3">
-                <div className="w-16 h-16 bg-primary-500 rounded-2xl flex items-center justify-center">
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Hero Section */}
+        <div className="text-center mb-16">
+          {/* Logo */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <img 
+              src="/images/hatchworks-logo.png" 
+              alt="HatchWorks AI" 
+              className="h-20 w-auto"
+              onError={(e) => {
+                e.currentTarget.style.display = 'none';
+                const fallback = e.currentTarget.nextElementSibling as HTMLElement;
+                if (fallback) fallback.classList.remove('hidden');
+              }}
+            />
+            {/* Fallback */}
+            <div className="hidden">
+              <div className="flex items-center gap-3">
+                <div className="w-20 h-20 bg-primary-500 rounded-2xl flex items-center justify-center">
                   <span className="text-white font-bold text-3xl">H</span>
                 </div>
-                <h1 className="text-5xl font-bold text-gray-900">
+                <h1 className="text-6xl font-bold text-gray-900">
                   HatchWorks<span className="text-primary-500">AI</span>
                 </h1>
               </div>
             </div>
-            <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              How can we help with your AI initiatives?
-            </h2>
           </div>
 
-          {/* Search Form */}
-          <form onSubmit={handleSearch} className="mb-16">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+            Welcome to <span className="text-primary-500">HatchWorks</span>AI
+          </h1>
+          <p className="text-xl text-gray-600 mb-12">
+            How can we assist you today?
+          </p>
+
+          {/* Search Box */}
+          <form onSubmit={handleSearch} className="max-w-3xl mx-auto mb-8">
             <div className="relative">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400" />
               <input
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Ask about AI opportunities..."
-                className="w-full px-6 py-5 text-lg border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all shadow-sm"
+                placeholder="Ask about financial analysis, market trends, KPIs, or AI opportunities..."
+                className="w-full pl-16 pr-6 py-5 text-lg text-gray-700 placeholder-gray-400 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all shadow-sm"
               />
               <button
-                type="button"
-                className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-gray-400 hover:text-gray-600 transition-colors"
+                type="submit"
+                className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium flex items-center gap-2"
               >
-                <Paperclip className="w-6 h-6" />
+                Ask
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </form>
 
-          {/* Examples */}
-          <div className="text-center">
-            <h3 className="text-sm font-medium text-gray-500 mb-6">Examples</h3>
-            <div className="grid md:grid-cols-3 gap-4">
-              {exampleQueries.map((example, index) => (
+          {/* Quick Examples */}
+          <div className="max-w-3xl mx-auto">
+            <p className="text-sm text-gray-500 mb-3">Try asking:</p>
+            <div className="flex flex-wrap justify-center gap-2">
+              {quickExamples.map((example, index) => (
                 <button
                   key={index}
                   onClick={() => {
-                    setQuery(example.query);
-                    navigate('/chat', { state: { initialMessage: example.query } });
+                    setQuery(example);
+                    navigate('/chat', { state: { initialMessage: example } });
                   }}
-                  className="p-6 bg-white border border-gray-200 rounded-xl text-left hover:border-primary-500 hover:shadow-md transition-all group"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-primary-500 hover:text-primary-600 transition-all"
                 >
-                  <h4 className="font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
-                    {example.title}
-                  </h4>
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {example.query}
-                  </p>
+                  {example}
                 </button>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Use Cases Section */}
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold text-gray-900 text-center mb-4">
+            What can HatchWorks AI help you with?
+          </h2>
+          <p className="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
+            From financial analysis to AI opportunity identification, our platform provides 
+            intelligent insights to drive your business forward.
+          </p>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {useCases.map((useCase, index) => (
+              <div
+                key={index}
+                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-primary-500 transition-all cursor-pointer group"
+                onClick={() => {
+                  setQuery(useCase.example);
+                  navigate('/chat', { state: { initialMessage: useCase.example } });
+                }}
+              >
+                <div className={`w-14 h-14 ${useCase.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+                  {useCase.icon}
+                </div>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                  {useCase.title}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+                  {useCase.description}
+                </p>
+                <div className="flex items-center text-primary-500 text-sm font-medium group-hover:gap-2 transition-all">
+                  <span>Try example</span>
+                  <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* CTA Section */}
+        <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-12 text-center text-white">
+          <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
+          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+            Explore our AI agents or dive right into a conversation to discover 
+            how we can help transform your business.
+          </p>
+          <div className="flex justify-center gap-4">
+            <button
+              onClick={() => navigate('/chat')}
+              className="px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+            >
+              Start Chat
+            </button>
+            <button
+              onClick={() => navigate('/catalog')}
+              className="px-8 py-4 bg-primary-700 text-white rounded-xl font-semibold hover:bg-primary-800 transition-colors border-2 border-primary-400"
+            >
+              Browse Agents
+            </button>
           </div>
         </div>
       </main>

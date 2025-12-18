@@ -24,11 +24,15 @@ interface FileData {
 interface ChatInterfaceProps {
   selectedSessionId?: string;
   onSessionChange?: () => void;
+  initialMessage?: string;
+  onMessageSent?: () => void;
 }
 
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   selectedSessionId,
   onSessionChange,
+  initialMessage,
+  onMessageSent,
 }) => {
   const { session, createSession } = useSession();
   const [messages, setMessages] = useState<Message[]>([]);
@@ -40,8 +44,28 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const [loadingMessages, setLoadingMessages] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const initialMessageSentRef = useRef(false);
 
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
+  // Handle initial message from homepage
+  useEffect(() => {
+    if (initialMessage && selectedSessionId && !isLoading && !initialMessageSentRef.current) {
+      console.log('📤 Auto-sending initial message:', initialMessage);
+      initialMessageSentRef.current = true;
+      
+      // Set the input with the initial message
+      setInput(initialMessage);
+      
+      // Send it after a short delay to ensure UI is ready
+      setTimeout(() => {
+        handleSendMessage(initialMessage);
+        if (onMessageSent) {
+          onMessageSent();
+        }
+      }, 100);
+    }
+  }, [initialMessage, selectedSessionId, isLoading]);
 
   // Load messages when selectedSessionId changes
   useEffect(() => {
@@ -49,6 +73,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       if (!selectedSessionId) {
         setMessages([]);
         setAttachedFiles([]);
+        initialMessageSentRef.current = false;
         return;
       }
 
@@ -149,14 +174,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     setAttachedFiles(prev => prev.filter(f => f.filename !== filename));
   };
 
-  const handleSend = async () => {
+  const handleSendMessage = async (messageText?: string) => {
     const currentSessionId = selectedSessionId || session?.id;
-    if ((!input.trim() && attachedFiles.length === 0) || !currentSessionId || isLoading) return;
+    const textToSend = messageText || input;
+    
+    if ((!textToSend.trim() && attachedFiles.length === 0) || !currentSessionId || isLoading) return;
 
     const userMessage: Message = {
       id: Date.now().toString(),
       role: 'user',
-      content: input || (attachedFiles.length > 0 ? "Please analyze the uploaded files." : ""),
+      content: textToSend || (attachedFiles.length > 0 ? "Please analyze the uploaded files." : ""),
       timestamp: new Date(),
       attachments: attachedFiles.length > 0 ? [...attachedFiles] : undefined
     };
@@ -178,7 +205,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
         },
         body: JSON.stringify({
           session_id: currentSessionId,
-          message: input || userMessage.content
+          message: textToSend || userMessage.content
         })
       });
 
@@ -241,6 +268,10 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleSend = () => {
+    handleSendMessage();
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
