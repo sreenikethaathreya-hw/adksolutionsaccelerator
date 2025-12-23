@@ -299,7 +299,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   if (!currentSessionId) {
     return (
       <div className="flex items-center justify-center h-full">
-        <Loader2 className="w-8 h-8 animate-spin text-primary-500" />
+        <Loader2 className="w-8 h-8 animate-spin text-[#3aabba]" />
       </div>
     );
   }
@@ -308,7 +308,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <Loader2 className="w-8 h-8 animate-spin text-primary-500 mx-auto mb-2" />
+          <Loader2 className="w-8 h-8 animate-spin text-[#3aabba] mx-auto mb-2" />
           <p className="text-gray-600">Loading conversation...</p>
         </div>
       </div>
@@ -321,7 +321,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center">
-            <Bot className="w-16 h-16 text-primary-500 mb-4" />
+            <Bot className="w-16 h-16 text-[#3aabba] mb-4" />
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
               Start a conversation
             </h3>
@@ -330,7 +330,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             </p>
             <button
               onClick={() => fileInputRef.current?.click()}
-              className="flex items-center gap-2 px-4 py-2 bg-primary-500 text-white rounded-lg hover:bg-primary-600 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-[#3aabba] text-white rounded-lg hover:bg-[#215f67] transition-colors"
             >
               <Paperclip className="w-4 h-4" />
               Upload Document
@@ -345,7 +345,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               }`}
             >
               {message.role === 'assistant' && (
-                <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-8 h-8 bg-[#3aabba] rounded-full flex items-center justify-center flex-shrink-0">
                   <Bot className="w-5 h-5 text-white" />
                 </div>
               )}
@@ -353,7 +353,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
               <div
                 className={`max-w-3xl rounded-2xl px-4 py-3 ${
                   message.role === 'user'
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-[#3aabba] text-white'
                     : 'bg-white border border-gray-200'
                 }`}
               >
@@ -364,7 +364,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                         key={idx}
                         className={`flex items-center gap-2 text-xs px-2 py-1 rounded ${
                           message.role === 'user'
-                            ? 'bg-primary-600'
+                            ? 'bg-[#215f67]'
                             : 'bg-gray-100 text-gray-700'
                         }`}
                       >
@@ -382,7 +382,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
                 <p
                   className={`text-xs mt-2 ${
-                    message.role === 'user' ? 'text-primary-100' : 'text-gray-500'
+                    message.role === 'user' ? 'text-white/70' : 'text-gray-500'
                   }`}
                 >
                   {message.timestamp.toLocaleTimeString()}
@@ -400,11 +400,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
         {isLoading && (
           <div className="flex gap-3">
-            <div className="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center flex-shrink-0">
+            <div className="w-8 h-8 bg-[#3aabba] rounded-full flex items-center justify-center flex-shrink-0">
               <Bot className="w-5 h-5 text-white" />
             </div>
             <div className="bg-white border border-gray-200 rounded-2xl px-4 py-3">
-              <Loader2 className="w-5 h-5 animate-spin text-primary-500" />
+              <Loader2 className="w-5 h-5 animate-spin text-[#3aabba]" />
             </div>
           </div>
         )}
@@ -427,13 +427,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             {attachedFiles.map((file, idx) => (
               <div
                 key={idx}
-                className="flex items-center gap-2 px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm"
+                className="flex items-center gap-2 px-3 py-1 bg-[#3aabba]/10 text-[#3aabba] rounded-full text-sm"
               >
                 {getFileIcon(file.type)}
                 <span>{file.filename}</span>
                 <button
                   onClick={() => removeAttachment(file.filename)}
-                  className="hover:text-primary-900"
+                  className="hover:text-[#215f67]"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -460,7 +460,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
             disabled={uploadingFile}
             className={`p-3 rounded-lg transition-colors ${
               uploadingFile || attachedFiles.length > 0
-                ? 'bg-primary-500 text-white'
+                ? 'bg-[#3aabba] text-white'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
             title="Attach files"
@@ -482,14 +482,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
                 : "Type your message..."
             }
             rows={1}
-            className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+            className="flex-1 resize-none border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#3aabba] focus:border-transparent"
             style={{ minHeight: '52px', maxHeight: '150px' }}
           />
 
           <button
             onClick={handleSend}
             disabled={(!input.trim() && attachedFiles.length === 0) || isLoading}
-            className="bg-primary-500 text-white p-3 rounded-lg hover:bg-primary-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="bg-[#3aabba] text-white p-3 rounded-lg hover:bg-[#215f67] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             {isLoading ? (
               <Loader2 className="w-5 h-5 animate-spin" />

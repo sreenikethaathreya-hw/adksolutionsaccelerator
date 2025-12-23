@@ -20,8 +20,8 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-primary/70">Loading...</p>
         </div>
       </div>
     );
@@ -76,7 +76,7 @@ const AppLayout: React.FC = () => {
     <div className="flex h-screen overflow-hidden">
       {/* Global Chat History Sidebar */}
       {!isLoginPage && sidebarOpen && (
-        <div className="w-80 border-r border-gray-200 bg-white flex-shrink-0">
+        <div className="w-80 border-r border-primary/10 bg-white flex-shrink-0">
           <ChatHistory
             key={refreshKey}
             currentSessionId={selectedSessionId}
@@ -179,7 +179,7 @@ const HomePage: React.FC = () => {
   ];
 
   return (
-    <div className="min-h-full bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-full bg-gradient-to-br from-white via-primary/5 to-white">
       <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         {/* Hero Section */}
         <div className="text-center mb-20">
@@ -198,25 +198,25 @@ const HomePage: React.FC = () => {
             {/* Fallback */}
             <div className="hidden">
               <div className="flex items-center gap-3">
-                <div className="w-24 h-24 bg-gradient-to-br from-primary-500 to-primary-600 rounded-3xl flex items-center justify-center shadow-lg">
+                <div className="w-24 h-24 bg-primary rounded-3xl flex items-center justify-center shadow-lg">
                   <span className="text-white font-bold text-4xl">H</span>
                 </div>
-                <h1 className="text-7xl font-bold text-gray-900">
-                  HatchWorks<span className="text-primary-500">AI</span>
+                <h1 className="text-7xl font-bold text-primary/80">
+                  HatchWorks<span className="text-primary">AI</span>
                 </h1>
               </div>
             </div>
           </div>
 
-          <p className="text-2xl text-gray-600 mb-16 font-light">
+          <p className="text-2xl text-primary/70 mb-16 font-light">
             How can we assist you today?
           </p>
 
           {/* Search Box */}
           <form onSubmit={handleSearch} className="max-w-4xl mx-auto mb-12">
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary-400 to-primary-600 rounded-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
-              <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-6 h-6 text-gray-400 group-hover:text-primary-500 transition-colors z-10" />
+              <div className="absolute inset-0 bg-primary rounded-3xl opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+              <Search className="absolute left-7 top-1/2 -translate-y-1/2 w-6 h-6 text-primary/40 group-hover:text-primary transition-colors z-10" />
               <input
                 type="text"
                 value={query}
@@ -227,12 +227,12 @@ const HomePage: React.FC = () => {
                   }
                 }}
                 placeholder="Ask about financial analysis, market trends, KPIs, or AI opportunities..."
-                className="w-full pl-16 pr-32 py-6 text-lg text-gray-700 placeholder-gray-400 bg-white border-2 border-gray-200 rounded-3xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all shadow-lg hover:shadow-xl relative z-0"
+                className="w-full pl-16 pr-32 py-6 text-lg text-primary placeholder-primary/40 bg-white border-2 border-primary/20 rounded-3xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/20 transition-all shadow-lg hover:shadow-xl relative z-0"
               />
               <button
                 type="submit"
                 disabled={!query.trim()}
-                className="absolute right-3 top-1/2 -translate-y-1/2 px-8 py-3 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-2xl hover:from-primary-600 hover:to-primary-700 transition-all font-semibold flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
+                className="absolute right-3 top-1/2 -translate-y-1/2 px-8 py-3 bg-primary text-white rounded-2xl hover:bg-accent transition-all duration-300 font-semibold flex items-center gap-2 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed z-10"
               >
                 Ask
                 <ArrowRight className="w-5 h-5" />
@@ -243,7 +243,7 @@ const HomePage: React.FC = () => {
 
         {/* Marquee Examples Section */}
         <div className="mb-20 overflow-hidden">
-          <p className="text-center text-base text-gray-600 mb-8 font-medium">Quick examples to get you started:</p>
+          <p className="text-center text-base text-primary/70 mb-8 font-medium">Quick examples to get you started:</p>
           <div className="relative">
             <div className="absolute left-0 top-0 bottom-0 w-32 bg-gradient-to-r from-white via-white to-transparent z-10"></div>
             <div className="absolute right-0 top-0 bottom-0 w-32 bg-gradient-to-l from-white via-white to-transparent z-10"></div>
@@ -256,7 +256,7 @@ const HomePage: React.FC = () => {
                     setQuery(example);
                     navigate('/chat', { state: { initialMessage: example } });
                   }}
-                  className="flex-shrink-0 mx-2 px-6 py-3 bg-white border-2 border-gray-200 rounded-full text-sm text-gray-700 hover:border-primary-500 hover:text-primary-600 hover:shadow-lg transition-all whitespace-nowrap font-medium"
+                  className="flex-shrink-0 mx-2 px-6 py-3 bg-white border-2 border-primary/20 rounded-full text-sm text-primary/70 hover:border-primary hover:text-primary hover:shadow-lg transition-all duration-300 whitespace-nowrap font-medium"
                 >
                   {example}
                 </button>
@@ -266,27 +266,27 @@ const HomePage: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-primary-500 via-primary-600 to-primary-700 rounded-3xl p-16 text-center text-white shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-primary via-accent to-secondary rounded-3xl p-16 text-center text-white shadow-2xl relative overflow-hidden">
           {/* Decorative elements */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-white opacity-5 rounded-full -translate-y-32 translate-x-32"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-white opacity-5 rounded-full translate-y-48 -translate-x-48"></div>
           
           <div className="relative z-10">
             <h2 className="text-4xl font-bold mb-6">Ready to get started?</h2>
-            <p className="text-xl text-primary-100 mb-10 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl text-white/80 mb-10 max-w-2xl mx-auto leading-relaxed">
               Explore our AI agents or dive right into a conversation to discover 
               how we can help transform your business.
             </p>
             <div className="flex flex-wrap justify-center gap-6">
               <button
                 onClick={() => navigate('/chat')}
-                className="px-10 py-4 bg-white text-primary-600 rounded-2xl font-bold hover:bg-gray-50 hover:shadow-2xl transition-all text-lg"
+                className="px-10 py-4 bg-white text-primary rounded-2xl font-bold hover:bg-primary/5 hover:shadow-2xl transition-all duration-300 text-lg"
               >
                 Start Chat
               </button>
               <button
                 onClick={() => navigate('/catalog')}
-                className="px-10 py-4 bg-primary-800 text-white rounded-2xl font-bold hover:bg-primary-900 transition-all border-2 border-primary-400 text-lg"
+                className="px-10 py-4 bg-secondary text-white rounded-2xl font-bold hover:bg-secondary/80 transition-all duration-300 border-2 border-white/20 text-lg"
               >
                 Browse Agents
               </button>

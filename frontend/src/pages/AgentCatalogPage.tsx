@@ -71,7 +71,7 @@ export const AgentCatalogPage: React.FC = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary-500 mb-3">Agent Catalog</h1>
+          <h1 className="text-4xl font-bold text-[#3aabba] mb-3">Agent Catalog</h1>
           <p className="text-base text-gray-600 leading-relaxed">
             Powerful AI agents designed to support you with financial analysis, market research, 
             AI opportunity identification, and KPI development for your clients.
@@ -89,7 +89,7 @@ export const AgentCatalogPage: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search agents by name, description, or tag..."
-                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3aabba] focus:border-transparent bg-white"
               />
             </div>
 
@@ -128,9 +128,9 @@ export const AgentCatalogPage: React.FC = () => {
                 onClick={() => toggleTag(tag)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                   tag === 'All' && selectedTags.length === 0
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-[#3aabba] text-white'
                     : selectedTags.includes(tag)
-                    ? 'bg-primary-500 text-white'
+                    ? 'bg-[#3aabba] text-white'
                     : 'bg-white border border-gray-300 text-gray-700 hover:border-gray-400'
                 }`}
               >
@@ -174,7 +174,7 @@ export const AgentCatalogPage: React.FC = () => {
                 setSearchQuery('');
                 setSelectedTags([]);
               }}
-              className="bg-primary-500 text-white px-6 py-2 rounded-lg hover:bg-primary-600 transition-colors"
+              className="bg-[#3aabba] text-white px-6 py-2 rounded-lg hover:bg-[#215f67] transition-colors"
             >
               Clear all filters
             </button>
@@ -198,10 +198,10 @@ export const AgentCatalogPage: React.FC = () => {
                     },
                   })
                 }
-                className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-primary-500 hover:shadow-md transition-all duration-200 cursor-pointer"
+                className="group bg-white rounded-xl border border-gray-200 p-6 hover:border-[#3aabba] hover:shadow-md transition-all duration-200 cursor-pointer"
               >
                 {/* Agent Name */}
-                <h3 className="text-xl font-semibold text-primary-500 mb-3 group-hover:text-primary-600 transition-colors">
+                <h3 className="text-xl font-semibold text-[#3aabba] mb-3 group-hover:text-[#215f67] transition-colors">
                   {agent.name}
                 </h3>
 

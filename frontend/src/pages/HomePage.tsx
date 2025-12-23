@@ -16,42 +16,42 @@ export const HomePage: React.FC = () => {
 
   const useCases = [
     {
-      icon: <LineChart className="w-6 h-6 text-primary-500" />,
+      icon: <LineChart className="w-6 h-6 text-[#3aabba]" />,
       title: 'Financial Analysis',
       description: 'Analyze P&L statements, balance sheets, and cash flow with AI-powered insights',
       example: 'Analyze Q4 financials for TechCorp with $5M revenue',
       color: 'bg-blue-50',
     },
     {
-      icon: <TrendingUp className="w-6 h-6 text-primary-500" />,
+      icon: <TrendingUp className="w-6 h-6 text-[#3aabba]" />,
       title: 'Market Research',
       description: 'Track industry trends, competitive landscape, and market opportunities',
       example: 'What are the top trends in fintech for 2024?',
       color: 'bg-green-50',
     },
     {
-      icon: <Target className="w-6 h-6 text-primary-500" />,
+      icon: <Target className="w-6 h-6 text-[#3aabba]" />,
       title: 'KPI Development',
       description: 'Generate custom KPIs and performance indicators for your business',
       example: 'Generate 5 KPIs for a SaaS company with 1000 customers',
       color: 'bg-purple-50',
     },
     {
-      icon: <Lightbulb className="w-6 h-6 text-primary-500" />,
+      icon: <Lightbulb className="w-6 h-6 text-[#3aabba]" />,
       title: 'AI Opportunity Identification',
       description: 'Discover AI use cases and opportunities specific to your industry',
       example: 'Find AI opportunities for retail banking operations',
       color: 'bg-yellow-50',
     },
     {
-      icon: <Shield className="w-6 h-6 text-primary-500" />,
+      icon: <Shield className="w-6 h-6 text-[#3aabba]" />,
       title: 'Risk Assessment',
       description: 'Evaluate business risks and develop mitigation strategies',
       example: 'Assess risks for expanding into European markets',
       color: 'bg-red-50',
     },
     {
-      icon: <Zap className="w-6 h-6 text-primary-500" />,
+      icon: <Zap className="w-6 h-6 text-[#3aabba]" />,
       title: 'Process Automation',
       description: 'Identify processes that can be automated to improve efficiency',
       example: 'Which manual processes can we automate in finance?',
@@ -89,21 +89,21 @@ export const HomePage: React.FC = () => {
             {/* Fallback */}
             <div className="hidden">
               <div className="flex items-center gap-3">
-                <div className="w-20 h-20 bg-primary-500 rounded-2xl flex items-center justify-center">
+                <div className="w-20 h-20 bg-[#3aabba] rounded-2xl flex items-center justify-center">
                   <span className="text-white font-bold text-3xl">H</span>
                 </div>
                 <h1 className="text-6xl font-bold text-gray-900">
-                  HatchWorks<span className="text-primary-500">AI</span>
+                  HatchWorks<span className="text-[#3aabba]">AI</span>
                 </h1>
               </div>
             </div>
           </div>
 
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Welcome to <span className="text-primary-500">HatchWorks</span>AI
+            Welcome to <span className="text-[#3aabba]">HatchWorks</span>AI
           </h1>
           <p className="text-xl text-gray-600 mb-12">
-            How can we assist you today?
+            Your AI-powered financial analysis platform
           </p>
 
           {/* Search Box */}
@@ -115,11 +115,11 @@ export const HomePage: React.FC = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Ask about financial analysis, market trends, KPIs, or AI opportunities..."
-                className="w-full pl-16 pr-6 py-5 text-lg text-gray-700 placeholder-gray-400 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-primary-500 focus:ring-4 focus:ring-primary-100 transition-all shadow-sm"
+                className="w-full pl-16 pr-6 py-5 text-lg text-gray-700 placeholder-gray-400 bg-white border-2 border-gray-200 rounded-2xl focus:outline-none focus:border-[#3aabba] focus:ring-4 focus:ring-[#3aabba]/20 transition-all shadow-sm"
               />
               <button
                 type="submit"
-                className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-primary-500 text-white rounded-xl hover:bg-primary-600 transition-colors font-medium flex items-center gap-2"
+                className="absolute right-3 top-1/2 -translate-y-1/2 px-6 py-2.5 bg-[#3aabba] text-white rounded-xl hover:bg-[#215f67] transition-colors font-medium flex items-center gap-2"
               >
                 Ask
                 <ArrowRight className="w-4 h-4" />
@@ -138,7 +138,7 @@ export const HomePage: React.FC = () => {
                     setQuery(example);
                     navigate('/chat', { state: { initialMessage: example } });
                   }}
-                  className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-primary-500 hover:text-primary-600 transition-all"
+                  className="px-4 py-2 bg-white border border-gray-200 rounded-full text-sm text-gray-700 hover:border-[#3aabba] hover:text-[#3aabba] transition-all"
                 >
                   {example}
                 </button>
@@ -161,7 +161,7 @@ export const HomePage: React.FC = () => {
             {useCases.map((useCase, index) => (
               <div
                 key={index}
-                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-primary-500 transition-all cursor-pointer group"
+                className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-[#3aabba] transition-all cursor-pointer group"
                 onClick={() => {
                   setQuery(useCase.example);
                   navigate('/chat', { state: { initialMessage: useCase.example } });
@@ -170,13 +170,13 @@ export const HomePage: React.FC = () => {
                 <div className={`w-14 h-14 ${useCase.color} rounded-xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
                   {useCase.icon}
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-[#3aabba] transition-colors">
                   {useCase.title}
                 </h3>
                 <p className="text-gray-600 text-sm mb-4 leading-relaxed">
                   {useCase.description}
                 </p>
-                <div className="flex items-center text-primary-500 text-sm font-medium group-hover:gap-2 transition-all">
+                <div className="flex items-center text-[#3aabba] text-sm font-medium group-hover:gap-2 transition-all">
                   <span>Try example</span>
                   <ArrowRight className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
@@ -186,22 +186,22 @@ export const HomePage: React.FC = () => {
         </div>
 
         {/* CTA Section */}
-        <div className="bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl p-12 text-center text-white">
+        <div className="bg-gradient-to-br from-[#3aabba] to-[#215f67] rounded-2xl p-12 text-center text-white">
           <h2 className="text-3xl font-bold mb-4">Ready to get started?</h2>
-          <p className="text-xl text-primary-100 mb-8 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
             Explore our AI agents or dive right into a conversation to discover 
             how we can help transform your business.
           </p>
           <div className="flex justify-center gap-4">
             <button
               onClick={() => navigate('/chat')}
-              className="px-8 py-4 bg-white text-primary-600 rounded-xl font-semibold hover:bg-gray-50 transition-colors"
+              className="px-8 py-4 bg-white text-[#3aabba] rounded-xl font-semibold hover:bg-gray-50 transition-colors"
             >
               Start Chat
             </button>
             <button
               onClick={() => navigate('/catalog')}
-              className="px-8 py-4 bg-primary-700 text-white rounded-xl font-semibold hover:bg-primary-800 transition-colors border-2 border-primary-400"
+              className="px-8 py-4 bg-[#215f67] text-white rounded-xl font-semibold hover:bg-[#2D2D2D] transition-colors border-2 border-white/20"
             >
               Browse Agents
             </button>

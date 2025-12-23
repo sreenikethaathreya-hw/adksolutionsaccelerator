@@ -112,7 +112,7 @@ export const SettingsPage: React.FC = () => {
                 onClick={() => setActiveTab('account')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                   activeTab === 'account'
-                    ? 'bg-primary-50 text-primary-600'
+                    ? 'bg-[#3aabba]/10 text-[#3aabba]'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -124,7 +124,7 @@ export const SettingsPage: React.FC = () => {
                 onClick={() => setActiveTab('services')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                   activeTab === 'services'
-                    ? 'bg-primary-50 text-primary-600'
+                    ? 'bg-[#3aabba]/10 text-[#3aabba]'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -136,7 +136,7 @@ export const SettingsPage: React.FC = () => {
                 onClick={() => setActiveTab('preferences')}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
                   activeTab === 'preferences'
-                    ? 'bg-primary-50 text-primary-600'
+                    ? 'bg-[#3aabba]/10 text-[#3aabba]'
                     : 'text-gray-700 hover:bg-gray-50'
                 }`}
               >
@@ -315,7 +315,7 @@ export const SettingsPage: React.FC = () => {
                           <button
                             key={service.id}
                             onClick={() => handleConnect(service.id)}
-                            className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-left"
+                            className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-lg hover:border-[#3aabba] hover:bg-[#3aabba]/10 transition-colors text-left"
                           >
                             <div className="flex items-center gap-3">
                               <div className="text-2xl">{service.icon}</div>
@@ -342,7 +342,7 @@ export const SettingsPage: React.FC = () => {
                         <div className="font-medium text-gray-900">Read documents</div>
                         <div className="text-sm text-gray-500">Allow agents to read files from connected services</div>
                       </div>
-                      <input type="checkbox" defaultChecked className="w-5 h-5 text-primary-600" />
+                      <input type="checkbox" defaultChecked className="w-5 h-5 text-[#3aabba]" />
                     </label>
                     
                     <label className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -350,7 +350,7 @@ export const SettingsPage: React.FC = () => {
                         <div className="font-medium text-gray-900">Write documents</div>
                         <div className="text-sm text-gray-500">Allow agents to create and modify files</div>
                       </div>
-                      <input type="checkbox" className="w-5 h-5 text-primary-600" />
+                      <input type="checkbox" className="w-5 h-5 text-[#3aabba]" />
                     </label>
                     
                     <label className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -358,7 +358,7 @@ export const SettingsPage: React.FC = () => {
                         <div className="font-medium text-gray-900">Access calendar</div>
                         <div className="text-sm text-gray-500">Allow agents to view and create calendar events</div>
                       </div>
-                      <input type="checkbox" className="w-5 h-5 text-primary-600" />
+                      <input type="checkbox" className="w-5 h-5 text-[#3aabba]" />
                     </label>
                   </div>
                 </div>
@@ -388,7 +388,7 @@ export const SettingsPage: React.FC = () => {
                         type="checkbox"
                         checked={notifications.email}
                         onChange={(e) => setNotifications({ ...notifications, email: e.target.checked })}
-                        className="w-5 h-5 text-primary-600"
+                        className="w-5 h-5 text-[#3aabba]"
                       />
                     </label>
 
@@ -401,7 +401,7 @@ export const SettingsPage: React.FC = () => {
                         type="checkbox"
                         checked={notifications.desktop}
                         onChange={(e) => setNotifications({ ...notifications, desktop: e.target.checked })}
-                        className="w-5 h-5 text-primary-600"
+                        className="w-5 h-5 text-[#3aabba]"
                       />
                     </label>
 
@@ -414,7 +414,7 @@ export const SettingsPage: React.FC = () => {
                         type="checkbox"
                         checked={notifications.agentUpdates}
                         onChange={(e) => setNotifications({ ...notifications, agentUpdates: e.target.checked })}
-                        className="w-5 h-5 text-primary-600"
+                        className="w-5 h-5 text-[#3aabba]"
                       />
                     </label>
                   </div>
@@ -434,7 +434,7 @@ export const SettingsPage: React.FC = () => {
                         onClick={() => setTheme('light')}
                         className={`flex items-center gap-3 p-4 border-2 rounded-lg transition-colors ${
                           theme === 'light'
-                            ? 'border-primary-500 bg-primary-50'
+                            ? 'border-[#3aabba] bg-[#3aabba]/10'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -446,7 +446,7 @@ export const SettingsPage: React.FC = () => {
                         onClick={() => setTheme('dark')}
                         className={`flex items-center gap-3 p-4 border-2 rounded-lg transition-colors ${
                           theme === 'dark'
-                            ? 'border-primary-500 bg-primary-50'
+                            ? 'border-[#3aabba] bg-[#3aabba]/10'
                             : 'border-gray-200 hover:border-gray-300'
                         }`}
                       >
@@ -472,7 +472,7 @@ export const SettingsPage: React.FC = () => {
                     <select
                       value={language}
                       onChange={(e) => setLanguage(e.target.value)}
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3aabba]"
                     >
                       <option value="en">English</option>
                       <option value="es">Español</option>

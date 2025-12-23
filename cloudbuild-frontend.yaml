@@ -1,0 +1,20 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-f'
+      - 'frontend/Dockerfile'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/hatchworks-ai-prod/hatchworks-ai/frontend:latest'
+      - '--build-arg'
+      - 'VITE_API_URL=${_BACKEND_URL}'
+      - '.'
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'push'
+      - 'us-central1-docker.pkg.dev/hatchworks-ai-prod/hatchworks-ai/frontend:latest'
+timeout: 1200s
+options:
+  machineType: 'E2_HIGHCPU_8'
+substitutions:
+  _BACKEND_URL: 'https://hatchworks-ai-backend-970945758078.us-central1.run.app'
